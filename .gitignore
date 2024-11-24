@@ -38,7 +38,7 @@ backend/uploads/
 # MacOS
 .DS_Store
 
-# # Docker
+# Docker
 # docker-compose.override.yml
 # .dockerignore
 
