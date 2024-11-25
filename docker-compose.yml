@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+
+  mongo:
+    image: mongo:5.0 # MongoDB için hazır image kullanımı
+    container_name: mongo
+    # ports:
+    #       - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mern-stack
+    
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "5000:5000" # Backend API için port yönlendirme
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/todolist # MongoDB container'ına bağlantı
+    depends_on:
+      - mongo
+    networks:
+      - mern-stack
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80" # Frontend uygulaması için port yönlendirme
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:3000 # Backend'e erişim için servis adı
+    depends_on:
+      - backend
+    networks:
+      - mern-stack
+
+
+
+
+volumes:
+  mongo_data:
+
+
+networks:
+  mern-stack:
+    driver: bridge
