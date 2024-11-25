@@ -7,10 +7,17 @@ const app = express();
 app.use(express.json());
 app.use(cors());  // Frontend ile iletişim kurabilmek için
 
-// MongoDB bağlantısı
-mongoose.connect('mongodb://localhost/todolist', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected')) 
-  .catch(err => console.log(err));
+// // MongoDB  local bağlantısı
+// mongoose.connect('mongodb://localhost/todolist', { useNewUrlParser: true, useUnifiedTopology: true })
+//   .then(() => console.log('MongoDB connected')) 
+//   .catch(err => console.log(err));
+
+
+// MongoDB container bağlantısı
+mongoose.connect('mongodb://mongo:27017/todolist')
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.log('MongoDB connection error: ', err));
+
 
 // List Schema ve Modeli
 const listSchema = new mongoose.Schema({
