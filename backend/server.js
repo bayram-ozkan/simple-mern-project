@@ -6,6 +6,9 @@ const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cors());  // Frontend ile iletişim kurabilmek için
+require('dotenv').config();
+//  Rkh60h9mUYo9NWEx password.
+
 
 // // MongoDB  local bağlantısı
 // mongoose.connect('mongodb://localhost/todolist', { useNewUrlParser: true, useUnifiedTopology: true })
@@ -13,15 +16,15 @@ app.use(cors());  // Frontend ile iletişim kurabilmek için
 //   .catch(err => console.log(err));
 
 
-require('dotenv').config(); // .env dosyasını yükle
-
-// Başka bir yerde tekrarlamamanız için sadece bir kez require edin.
-const mongoose = require('mongoose');
-
-// Kendi veritabanı bağlantınızı gerçekleştirin
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB bağlantısı başarılı"))
-  .catch(err => console.error("MongoDB bağlantı hatası:", err));
+// MongoDB container
+mongoose
+  .connect(
+    process.env.MONGO_URL )
+  .then(() => console.log("connected DataBase"))
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => console.log(err));
 
 
 // List Schema ve Modeli

@@ -7,7 +7,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: backend 
   template:
     metadata:
       labels:
@@ -17,37 +17,11 @@ spec:
         - name: backend
           image: bbw0r1d/mern-backend
           imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
           env:
-            - name: MONGO_URI
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: mongodb-uri
-            - name: MONGO_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: mongodb-root-username
-            - name: MONGO_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: mongodb-root-password
-            - name: MONGO_DBNAME
-              value: "mern-db"
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend
-  namespace: mern-stack
-spec:
-  selector:
-    app: backend
-  ports:
-    - protocol: TCP
-      port: 5000
-      targetPort: 5000
-  type: LoadBalancer
-
+          - name: MONGO_URL
+            valueFrom:
+              configMapKeyRef:
+                name: mongo-config
+                key: mongo-url

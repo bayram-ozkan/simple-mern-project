@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+  namespace: mern-stack
+data:
+  mongo-url: "mongodb://mongouser:mongopassword@mongodb:27017"
