@@ -21,9 +21,16 @@ jobs:
     # 2. AWS CLI ve Kubectl Kurulum
     - name: Install AWS CLI and Kubectl
       run: |
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        sudo ./aws/install
+        # AWS CLI kurulumu (varsa güncelleme)
+        if ! command -v aws &> /dev/null; then
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+        else
+          echo "AWS CLI is already installed. Skipping installation."
+        fi
+        
+        # Kubectl kurulumu
         sudo apt-get update && sudo apt-get install -y curl unzip
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
@@ -39,15 +46,14 @@ jobs:
     # 4. EKS Kümesi Oluştur
     - name: Create EKS Cluster
       run: |
-        # EKS kümesi oluşturma komutu
-        eksctl create cluster \
+        # EKS kümesi oluşturulması
+        aws eks create-cluster \
           --name mern-cluster \
-          --region us-east-1 \
-          --nodegroup-name standard-workers \
-          --node-type t3.medium \
-          --nodes 2
+          --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/EKSClusterRole \
+          --resources-vpc-config subnetIds=${{ secrets.SUBNET_IDS }},securityGroupIds=${{ secrets.SECURITY_GROUP_IDS }} \
+          --region us-east-1
 
-        # Kümenin hazır olduğundan emin olmak için bekleyin
+        # Kümenin aktif olmasını bekle
         aws eks wait cluster-active --name mern-cluster --region us-east-1
 
     # 5. Kubernetes için Kubeconfig Ayarla
