@@ -23,13 +23,25 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: mongodb-uri
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-root-username
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-root-password
+            - name: MONGO_DBNAME
+              value: "mern-db"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace:
+  namespace: mern-stack
 spec:
   selector:
     app: backend

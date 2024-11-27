@@ -15,23 +15,13 @@ app.use(cors());  // Frontend ile iletişim kurabilmek için
 
 require('dotenv').config(); // .env dosyasını yükle
 
+// Başka bir yerde tekrarlamamanız için sadece bir kez require edin.
 const mongoose = require('mongoose');
 
-// MongoDB bağlantı URI'sini .env dosyasından al
-// const mongoURI = process.env.MONGO_URI;
-const mongoURI = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}?authSource=admin`;
-
-
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('MongoDB bağlantısı başarılı!');
-})
-.catch((err) => {
-  console.error('MongoDB bağlantısı başarısız: ', err);
-});
+// Kendi veritabanı bağlantınızı gerçekleştirin
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB bağlantısı başarılı"))
+  .catch(err => console.error("MongoDB bağlantı hatası:", err));
 
 
 // List Schema ve Modeli
