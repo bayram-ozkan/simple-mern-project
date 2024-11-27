@@ -31,12 +31,14 @@ jobs:
         fi
         
         # Kubectl kurulumu
+        sudo apt-get update && sudo apt-get install -y curl unzip
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
         # eksctl kurulumu
         if ! command -v eksctl &> /dev/null; then
-          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/0.142.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.142.0/eksctl_Linux_amd64.tar.gz" -o eksctl_Linux_amd64.tar.gz
+          tar -xvzf eksctl_Linux_amd64.tar.gz -C /tmp
           sudo mv /tmp/eksctl /usr/local/bin
         else
           echo "eksctl is already installed. Skipping installation."
