@@ -46,11 +46,13 @@ jobs:
     # 4. EKS Kümesi Oluştur
     - name: Create EKS Cluster
       run: |
-        # EKS kümesi oluşturulması
-        aws eks create-cluster \
-          --name mern-cluster \
-          --region us-east-1
-
+        eksctl create cluster \
+        --name my-eks-cluster \
+        --region us-east-1 \
+        --nodegroup-name standard-workers \
+        --node-type t3.medium \
+        --nodes 2
+        
         # Kümenin aktif olmasını bekle
         aws eks wait cluster-active --name mern-cluster --region us-east-1
 
