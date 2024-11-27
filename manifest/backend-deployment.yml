@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: bbw0r1d/mern-backend:latest
+          image: bbw0r1d/mern-backend
           imagePullPolicy: Always
           env:
             - name: MONGO_URI

@@ -3,7 +3,9 @@ name: CI for backend
 on:
   push:
     branches:
-      - main 
+      - main
+    paths:
+      - 'backend/**'  # Sadece backend dizinindeki değişikliklerde tetiklenir
 
 jobs:
   CI-backend:
