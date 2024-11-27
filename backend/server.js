@@ -18,7 +18,9 @@ require('dotenv').config(); // .env dosyasını yükle
 const mongoose = require('mongoose');
 
 // MongoDB bağlantı URI'sini .env dosyasından al
-const mongoURI = process.env.MONGO_URI;
+// const mongoURI = process.env.MONGO_URI;
+const mongoURI = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}?authSource=admin`;
+
 
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
