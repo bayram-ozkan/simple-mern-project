@@ -14,7 +14,7 @@ app.use(cors());  // Frontend ile iletişim kurabilmek için
 
 
 // MongoDB container bağlantısı
-mongoose.connect('mongodb://mongo:27017/todolist')
+mongoose.connect('mongodb://mongodb:27017/todolist')
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('MongoDB connection error: ', err));
 
