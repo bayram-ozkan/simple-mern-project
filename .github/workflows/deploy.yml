@@ -56,18 +56,18 @@ jobs:
     - name: Create EKS Cluster
       run: |
         eksctl create cluster \
-        --name my-eks-cluster \
+        --name mern-cluster \
         --region us-east-1 \
         --nodegroup-name standard-workers \
         --node-type t3.medium \
         --nodes 2
         
         # Kümenin aktif olmasını bekle
-        aws eks wait cluster-active --name my-eks-cluster --region us-east-1
+        aws eks wait cluster-active --name mern-cluster --region us-east-1
 
     # 5. Kubernetes için Kubeconfig Ayarla
     - name: Update kubeconfig
-      run: aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
+      run: aws eks --region us-east-1 update-kubeconfig --name mern-cluster
 
     - name: Mongodb Deployment
       run: |
