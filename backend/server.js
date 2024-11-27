@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); // .env dosyasını yükle
-
 
 // Express ve Mongoose kurulumları
 const app = express();
@@ -15,19 +13,24 @@ app.use(cors());  // Frontend ile iletişim kurabilmek için
 //   .catch(err => console.log(err));
 
 
-// MongoDB bağlantı ayarları 
-const mongoURI = `mongodb://${username}:${password}@${mongoHost}:${mongoPort}/${dbName}?authSource=admin`;
+require('dotenv').config(); // .env dosyasını yükle
+
+const mongoose = require('mongoose');
+
+// MongoDB bağlantı URI'sini .env dosyasından al
+const mongoURI = process.env.MONGO_URI;
 
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => {
-    console.log('MongoDB bağlantısı başarılı!');
-  })
-  .catch((err) => {
-    console.error('MongoDB bağlantısı başarısız: ', err);
-  });
+.then(() => {
+  console.log('MongoDB bağlantısı başarılı!');
+})
+.catch((err) => {
+  console.error('MongoDB bağlantısı başarısız: ', err);
+});
+
 
 // List Schema ve Modeli
 const listSchema = new mongoose.Schema({

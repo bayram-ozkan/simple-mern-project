@@ -16,30 +16,20 @@ spec:
       containers:
         - name: backend
           image: bbw0r1d/mern-backend:latest
+          imagePullPolicy: Always
           env:
-            - name: MONGO_USERNAME
+            - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
-                  name: mongodb-secret
-                  key: mongodb-root-username
-            - name: MONGO_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: mongodb-root-password
-            - name: MONGO_DBNAME
-              value: "mern-db"
-            - name: MONGO_HOST
-              value: "mongodb"
-            - name: MONGO_PORT
-              value: "27017"
+                  name: mongodb-credentials
+                  key: mongodb-uri
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace: mern-stack
+  namespace:
 spec:
   selector:
     app: backend
