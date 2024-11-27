@@ -18,8 +18,8 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # 2. AWS CLI ve Kubectl Kurulum
-    - name: Install AWS CLI and Kubectl
+    # 2. AWS CLI, Kubectl ve eksctl Kurulum
+    - name: Install AWS CLI, Kubectl, and eksctl
       run: |
         # AWS CLI kurulumu (varsa güncelleme)
         if ! command -v aws &> /dev/null; then
@@ -34,6 +34,14 @@ jobs:
         sudo apt-get update && sudo apt-get install -y curl unzip
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+        # eksctl kurulumu
+        if ! command -v eksctl &> /dev/null; then
+          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/0.142.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+          sudo mv /tmp/eksctl /usr/local/bin
+        else
+          echo "eksctl is already installed. Skipping installation."
+        fi
 
     # 3. AWS Kimlik Bilgilerini Ayarla
     - name: Configure AWS Credentials
@@ -54,11 +62,11 @@ jobs:
         --nodes 2
         
         # Kümenin aktif olmasını bekle
-        aws eks wait cluster-active --name mern-cluster --region us-east-1
+        aws eks wait cluster-active --name my-eks-cluster --region us-east-1
 
     # 5. Kubernetes için Kubeconfig Ayarla
     - name: Update kubeconfig
-      run: aws eks --region us-east-1 update-kubeconfig --name mern-cluster
+      run: aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
 
     - name: Mongodb Deployment
       run: |
