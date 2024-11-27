@@ -14,7 +14,9 @@ app.use(cors());  // Frontend ile iletişim kurabilmek için
 
 
 // MongoDB bağlantı ayarları 
-mongoose.connect('mongodb://mongodb:27017/mern-db', {  // "mongodb" burada servis adıdır
+const mongoURI = `mongodb://${username}:${password}@${mongoHost}:${mongoPort}/${dbName}?authSource=admin`;
+
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -24,7 +26,6 @@ mongoose.connect('mongodb://mongodb:27017/mern-db', {  // "mongodb" burada servi
   .catch((err) => {
     console.error('MongoDB bağlantısı başarısız: ', err);
   });
-
 
 // List Schema ve Modeli
 const listSchema = new mongoose.Schema({
