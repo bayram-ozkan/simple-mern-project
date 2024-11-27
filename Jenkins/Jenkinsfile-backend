@@ -1,0 +1,73 @@
+pipeline {
+    agent any 
+    
+    environment{
+        cred = credentials('aws-key') // AWS access key için tanımlı credential
+        dockerhub_cred = credentials('docker-cred') // Docker Hub için tanımlı credential
+        DOCKER_IMAGE = "bbw0r1d/mern-frontend"
+        DOCKER_TAG = "$BUILD_NUMBER"
+        SONARQUBE_URL = 'http://localhost:9000/'
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
+    }
+    stages{
+        
+        stage("Git Checkout"){ // Repository checkout işlemi
+            steps{
+                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/bayram-ozkan/simple-mern-project'
+            }
+        }
+          
+        
+       stage("MVN build"){ // Maven build aşaması
+            steps{
+                // sh "mvn clean install -Dmaven.test.skip=true"
+                sh "mvn clean install -Dmaven.test.skip=true -U"
+
+            }
+        }
+
+        stage('SonarQube Analysis') { // SonarQube kod analizi
+           steps {
+                sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=jenkins-java \
+                    -Dsonar.host.url=${SONARQUBE_URL} \
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.java.binaries=target/classes
+                """
+            }    
+        }
+        
+
+
+
+        // trivy bypass 
+        // stage("TRIVY"){ // Docker image security kontrollü
+        //     steps{
+        //          sh "trivy image --scanners vuln ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                  
+
+        //     }
+        // }
+
+        stage("Deploy To EKS"){  // EKS'e deployment yapma
+            steps{
+                sh 'aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster'
+                sh 'kubectl apply -f manifest/deployment.yaml'
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "Job is completed"
+        }
+        success {
+            echo "It is a success"
+        }
+        failure {
+            echo "Job is failed"
+        }
+    }
+}
+    
