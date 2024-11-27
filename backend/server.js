@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config(); // .env dosyasını yükle
+
 
 // Express ve Mongoose kurulumları
 const app = express();
