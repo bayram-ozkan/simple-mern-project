@@ -1,5 +1,5 @@
 # Base image
-FROM node:18
+FROM node:18 AS build
 
 # Set working directory
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm run build
 
 # Use Nginx to serve the build files
 FROM nginx:latest
-COPY --from=0 /app/build /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Expose the port
 EXPOSE 80

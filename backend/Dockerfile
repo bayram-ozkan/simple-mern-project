@@ -1,18 +1,16 @@
-# Build stage: Geliştirme ortamında bağımlılıkların yüklenmesi
-FROM node:18-alpine AS builder
+# Build stage
+FROM node:18-alpine
+
 WORKDIR /app
+
+# package.json ve package-lock.json files 
 COPY package*.json ./
+
+# Bağımlılıkları yükle
 RUN npm install
+
 COPY . .
 
-# Production stage: Sadece gerekli dosyalar
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=builder /app ./
-RUN npm prune --production && npm cache clean --force
-
-# Expose the port
-EXPOSE 5000
 
 # Run the application
 CMD ["npm", "start"]

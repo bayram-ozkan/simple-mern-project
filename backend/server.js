@@ -13,10 +13,17 @@ app.use(cors());  // Frontend ile iletişim kurabilmek için
 //   .catch(err => console.log(err));
 
 
-// MongoDB container bağlantısı
-mongoose.connect('mongodb://mongodb:27017/todolist')
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log('MongoDB connection error: ', err));
+// MongoDB bağlantı ayarları 
+mongoose.connect('mongodb://mongodb:27017/mern-db', {  // "mongodb" burada servis adıdır
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => {
+    console.log('MongoDB bağlantısı başarılı!');
+  })
+  .catch((err) => {
+    console.error('MongoDB bağlantısı başarısız: ', err);
+  });
 
 
 // List Schema ve Modeli
