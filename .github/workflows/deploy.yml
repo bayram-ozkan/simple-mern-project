@@ -40,7 +40,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_K  EY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
     # 4. EKS Kümesi Oluştur
@@ -60,6 +60,7 @@ jobs:
 
     - name: Mongodb Deployment
       run: |
+        kubectl create ns mern-stack
         kubectl apply -f mongo-deployment.yml
         kubectl apply -f mongo-secret.yml
         kubectl apply -f mongo-configmap.yml
