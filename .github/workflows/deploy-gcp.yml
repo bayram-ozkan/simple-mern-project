@@ -14,7 +14,7 @@ env:
   FRONTEND_IMAGE: mern-frontend       # Frontend Docker image adı
   IMAGE_TAG: v1.0.0                   # Docker image versiyonu
   GAR_REPO: mern-stack                # Artifact Registry repository adı
-  NAMESPACE: mern-stack               # Kubernetes Namespace
+  NAMESPACE: mern-stack               # Kubernetes namespace adı
 
 jobs:
   build-publish-deploy:
@@ -30,7 +30,7 @@ jobs:
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: '${{ secrets.GK_SA_KEY }}'   # Service account key secret
+        credentials_json: '${{ secrets.GK_SA_KEY }}'  # GitHub Secret'ındaki JSON dosyasını kullan
 
     # Docker için kimlik doğrulama
     - name: Configure Docker Authentication
@@ -59,22 +59,19 @@ jobs:
     # MongoDB Deploy
     - name: Deploy MongoDB to GKE
       run: |-
-        kubectl apply -f database/mongodb-deployment.yml -n $NAMESPACE
-        kubectl apply -f database/mongodb-pv.yml -n $NAMESPACE
-        kubectl apply -f database/mongodb-secret.yml -n $NAMESPACE
-        kubectl get pods -n $NAMESPACE
+        kubectl apply -f database/mongodb-deployment.yml
+        kubectl apply -f database/mongodb-pv.yml
+        kubectl apply -f database/mongodb-secret.yml
 
     # Backend Deploy
     - name: Deploy Backend to GKE
       run: |-
-        kubectl apply -f manifest/mongo-config.yml -n $NAMESPACE
-        kubectl apply -f manifest/backend-deployment.yml -n $NAMESPACE
-        kubectl apply -f manifest/backend-service.yml -n $NAMESPACE
-        kubectl get pods -n $NAMESPACE
+        kubectl apply -f manifest/mongo-config.yml
+        kubectl apply -f manifest/backend-deployment.yml
+        kubectl apply -f manifest/backend-service.yml
 
     # Frontend Deploy
     - name: Deploy Frontend to GKE
       run: |-
-        kubectl apply -f manifest/frontend-deployment.yml -n $NAMESPACE
-        kubectl apply -f manifest/frontend-service.yml -n $NAMESPACE
-        kubectl get pods -n $NAMESPACE
+        kubectl apply -f manifest/frontend-deployment.yml
+        kubectl apply -f manifest/frontend-service.yml
