@@ -14,7 +14,7 @@ env:
   FRONTEND_IMAGE: mern-frontend       # Frontend Docker image adı
   IMAGE_TAG: v1.0.0                   # Docker image versiyonu
   GAR_REPO: mern-stack                # Artifact Registry repository adı
-  NAMESPACE: mern-stack               # Kubernetes namespace adı
+  NAMESPACE: mern-stack               # Kubernetes namespace
 
 jobs:
   build-publish-deploy:
@@ -30,7 +30,7 @@ jobs:
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: '${{ secrets.GK_SA_KEY }}'  # GitHub Secret'ındaki JSON dosyasını kullan
+        credentials_json: '${{ secrets.GK_SA_KEY }}'  # GitHub Secrets'ten alınan Service Account Key JSON dosyası
 
     # Docker için kimlik doğrulama
     - name: Configure Docker Authentication
