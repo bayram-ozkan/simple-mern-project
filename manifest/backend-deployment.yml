@@ -1,27 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
-  namespace: mern-stack
+  name: mern-backend
+  labels:
+    app: mern-backend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: backend 
+      app: mern-backend
   template:
     metadata:
       labels:
-        app: backend
+        app: mern-backend
     spec:
       containers:
-        - name: backend
-          image: bbw0r1d/mern-backend
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 5000
-          env:
-          - name: MONGO_URL
-            valueFrom:
-              configMapKeyRef:
-                name: mongo-config
-                key: mongo-url
+      - name: mern-backend
+        image: us-central1-docker.pkg.dev/ibbtech/mern-stack/mern-backend:v1.0.0
+        ports:
+        - containerPort: 5000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: MONGO_URI
+          value: "mongodb://mongo-service.default.svc.cluster.local:27017/mydatabase" # MongoDB bağlantı URI'sı
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mern-backend-service
+spec:
+  selector:
+    app: mern-backend
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer

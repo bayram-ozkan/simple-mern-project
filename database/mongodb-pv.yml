@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-pv
+spec:
+  capacity:
+    storage: 1Gi  # 5GB depolama talep ediyoruz
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  
+  storageClassName: standard  # GCP persistent disk kullanıyoruz
+  gcePersistentDisk:
+    pdName: mongodb-disk
+    fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard

@@ -2,10 +2,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongodb
-  namespace: mern-stack
 spec:
-  serviceName: mongodb
-  replicas: 2
+  serviceName: "mongodb"
+  replicas: 1
   selector:
     matchLabels:
       app: mongodb
@@ -16,30 +15,26 @@ spec:
     spec:
       containers:
       - name: mongodb
-        image: mongo:5.0
+        image: mongo:latest
         ports:
         - containerPort: 27017
         volumeMounts:
         - name: mongodb-data
           mountPath: /data/db
         env:
-        - name: mongoroot
+        - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: mongo-user
-        - name: ro00t321
+            secretManagerRef:
+              secretRef: "mongodb-root-username"
+        - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: mongo-password
-        - name: MONGO_INITDB_FEATURE_COMPATIBILITY_VERSION
-          value: "5.0"
+            secretManagerRef:
+              secretRef: "mongodb-root-password"
   volumeClaimTemplates:
   - metadata:
       name: mongodb-data
     spec:
-      accessModes: ["ReadWriteOnce"]
+      accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 1Gi
