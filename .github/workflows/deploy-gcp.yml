@@ -35,7 +35,7 @@ jobs:
     # Docker için kimlik doğrulama
     - name: Configure Docker Authentication
       run: |-
-        gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://$GAR_ZONE-docker.pkg.dev
+        docker login -u oauth2accesstoken -p "$(gcloud auth print-access-token)" https://$GAR_ZONE-docker.pkg.dev
 
     # GKE Cluster Erişim Bilgilerini Alma
     - name: Configure GKE Credentials
