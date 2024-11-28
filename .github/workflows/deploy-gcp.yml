@@ -14,6 +14,7 @@ env:
   FRONTEND_IMAGE: mern-frontend       # Frontend Docker image adı
   IMAGE_TAG: v1.0.0                   # Docker image versiyonu
   GAR_REPO: mern-stack                # Artifact Registry repository adı
+  NAMESPACE: mern-stack               # Kubernetes Namespace
 
 jobs:
   build-publish-deploy:
@@ -26,10 +27,16 @@ jobs:
       uses: actions/checkout@v4
 
     # GCloud CLI Kurulumu ve Kimlik Doğrulama
+    - name: Set up GCloud CLI
+      run: |
+        curl https://sdk.cloud.google.com | bash
+        source $HOME/google-cloud-sdk/path.bash.inc
+        gcloud --version
+
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: '${{ secrets.GK_SA_KEY }}'
+        credentials_json: '${{ secrets.GK_SA_KEY }}'   # Service account key secret
 
     # Docker için kimlik doğrulama
     - name: Configure Docker Authentication
@@ -58,21 +65,22 @@ jobs:
     # MongoDB Deploy
     - name: Deploy MongoDB to GKE
       run: |-
-        kubectl apply -f database/mongodb-deployment.yml
-        kubectl apply -f database/mongodb-pv.yml
-        kubectl apply -f database/mongodb-secret.yml
+        kubectl apply -f database/mongodb-deployment.yml -n $NAMESPACE
+        kubectl apply -f database/mongodb-pv.yml -n $NAMESPACE
+        kubectl apply -f database/mongodb-secret.yml -n $NAMESPACE
+        kubectl get pods -n $NAMESPACE
 
-        
     # Backend Deploy
     - name: Deploy Backend to GKE
       run: |-
-        kubectl apply -f manifest/mongo-config.yml
-        kubectl apply -f manifest/backend-deployment.yml
-        kubectl apply -f manifest/backend-service.yml
-
+        kubectl apply -f manifest/mongo-config.yml -n $NAMESPACE
+        kubectl apply -f manifest/backend-deployment.yml -n $NAMESPACE
+        kubectl apply -f manifest/backend-service.yml -n $NAMESPACE
+        kubectl get pods -n $NAMESPACE
 
     # Frontend Deploy
     - name: Deploy Frontend to GKE
       run: |-
-        kubectl apply -f manifest/frontend-deployment.yml
-        kubectl apply -f manifest/frontend-service.yml
+        kubectl apply -f manifest/frontend-deployment.yml -n $NAMESPACE
+        kubectl apply -f manifest/frontend-service.yml -n $NAMESPACE
+        kubectl get pods -n $NAMESPACE
