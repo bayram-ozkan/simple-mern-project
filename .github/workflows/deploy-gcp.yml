@@ -26,11 +26,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # GCloud CLI Kurulumu ve Kimlik Doğrulama
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v2'
-      with:
-        credentials_json: '${{ secrets.GK_SA_KEY }}'  # GitHub Secrets'ten alınan Service Account Key JSON dosyası
+    # # GCloud CLI Kurulumu ve Kimlik Doğrulama
+    # - id: 'auth'
+    #   uses: 'google-github-actions/auth@v2'
+    #   with:
+    #     credentials_json: '${{ secrets.GK_SA_KEY }}'  # GitHub Secrets'ten alınan Service Account Key JSON dosyası
 
     # Docker için kimlik doğrulama
     - name: Configure Docker Authentication
