@@ -1,0 +1,78 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches:
+      - gcp
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: test-cluster           # GKE cluster adı
+  GKE_ZONE: us-central1-a             # GKE cluster bölgesi
+  GAR_ZONE: us-central1               # Artifact Registry bölgesi
+  BACKEND_IMAGE: mern-backend         # Backend Docker image adı
+  FRONTEND_IMAGE: mern-frontend       # Frontend Docker image adı
+  IMAGE_TAG: v1.0.0                   # Docker image versiyonu
+  GAR_REPO: mern-stack                # Artifact Registry repository adı
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # GCloud CLI Kurulumu ve Kimlik Doğrulama
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GK_SA_KEY }}'
+
+    # Docker için kimlik doğrulama
+    - name: Configure Docker Authentication
+      run: |-
+        gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://$GAR_ZONE-docker.pkg.dev
+
+    # GKE Cluster Erişim Bilgilerini Alma
+    - name: Configure GKE Credentials
+      uses: google-github-actions/get-gke-credentials@v0
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+
+    # Backend Docker Image Build ve Push
+    - name: Build and Push Backend Image
+      run: |-
+        docker build -t "$GAR_ZONE-docker.pkg.dev/$PROJECT_ID/$GAR_REPO/$BACKEND_IMAGE:$IMAGE_TAG" -f backend/Dockerfile ./backend
+        docker push "$GAR_ZONE-docker.pkg.dev/$PROJECT_ID/$GAR_REPO/$BACKEND_IMAGE:$IMAGE_TAG"
+
+    # Frontend Docker Image Build ve Push
+    - name: Build and Push Frontend Image
+      run: |-
+        docker build -t "$GAR_ZONE-docker.pkg.dev/$PROJECT_ID/$GAR_REPO/$FRONTEND_IMAGE:$IMAGE_TAG" -f frontend/Dockerfile ./frontend
+        docker push "$GAR_ZONE-docker.pkg.dev/$PROJECT_ID/$GAR_REPO/$FRONTEND_IMAGE:$IMAGE_TAG"
+
+    # MongoDB Deploy
+    - name: Deploy MongoDB to GKE
+      run: |-
+        kubectl apply -f database/mongodb-deployment.yml
+        kubectl apply -f database/mongodb-pv.yml
+        kubectl apply -f database/mongodb-secret.yml
+
+        
+    # Backend Deploy
+    - name: Deploy Backend to GKE
+      run: |-
+        kubectl apply -f manifest/mongo-config.yml
+        kubectl apply -f manifest/backend-deployment.yml
+        kubectl apply -f manifest/backend-service.yml
+
+
+    # Frontend Deploy
+    - name: Deploy Frontend to GKE
+      run: |-
+        kubectl apply -f manifest/frontend-deployment.yml
+        kubectl apply -f manifest/frontend-service.yml
