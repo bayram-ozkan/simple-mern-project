@@ -27,12 +27,6 @@ jobs:
       uses: actions/checkout@v4
 
     # GCloud CLI Kurulumu ve Kimlik Doğrulama
-    - name: Set up GCloud CLI
-      run: |
-        curl https://sdk.cloud.google.com | bash
-        source $HOME/google-cloud-sdk/path.bash.inc
-        gcloud --version
-
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
