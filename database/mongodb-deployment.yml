@@ -4,7 +4,6 @@ metadata:
   name: mongodb
   namespace: mern-stack
 spec:
-# same name of the from which we have created the heaadless service 
   serviceName: mongodb
   replicas: 2
   selector:
@@ -24,21 +23,23 @@ spec:
         - name: mongodb-data
           mountPath: /data/db
         env:
-        - name: MONGO_INITDB_ROOT_USERNAME
+        - name: mongoroot
           valueFrom:
             secretKeyRef:
               name: mongo-secret
               key: mongo-user
-        - name: MONGO_INITDB_ROOT_PASSWORD
+        - name: ro00t321
           valueFrom:
             secretKeyRef:
               name: mongo-secret
               key: mongo-password
+        - name: MONGO_INITDB_FEATURE_COMPATIBILITY_VERSION
+          value: "5.0"
   volumeClaimTemplates:
   - metadata:
       name: mongodb-data
     spec:
-      accessModes: ["ReadWriteOnce"] 
+      accessModes: ["ReadWriteOnce"]
       resources:
         requests:
           storage: 1Gi

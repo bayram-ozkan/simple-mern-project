@@ -5,3 +5,7 @@ metadata:
   namespace: mern-stack
 data:
   mongo-url: "mongodb://mongouser:mongopassword@mongodb:27017"
+  mongo-user: bW9uZ291c2Vy  # base64 encode edilmiş kullanıcı adı (mongouser)
+  mongo-password: bW9uZ29wYXNzd29yZA==  # base64 encode edilmiş şifre (mongopassword)
+
+  
