@@ -7,44 +7,45 @@ on:
     paths:
       - 'backend/**'
       - 'frontend/**'
-      - '.github/workflows/deploy.yml'
+      - 'database/'
+      - '.github/workflows/deploy-aws.yml'
 
-jobs:
+jobs:   
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Repository'yi Checkout Et
+    # 1. Checkout the Repository
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # 2. AWS CLI, Kubectl ve eksctl Kurulum
+    # 2. Install AWS CLI, Kubectl, and eksctl
     - name: Install AWS CLI, Kubectl, and eksctl
       run: |
-        # AWS CLI kurulumu (varsa güncelleme)
+        # AWS CLI installation (update if exists)
         if ! command -v aws &> /dev/null; then
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install
         else
-          echo "AWS CLI is already installed. Skipping installation."
+          echo "AWS CLI is already installed."
         fi
         
-        # Kubectl kurulumu
+        # Install Kubectl
         sudo apt-get update && sudo apt-get install -y curl unzip
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-        # eksctl kurulumu
+        # Install eksctl
         if ! command -v eksctl &> /dev/null; then
           curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.142.0/eksctl_Linux_amd64.tar.gz" -o eksctl_Linux_amd64.tar.gz
           tar -xvzf eksctl_Linux_amd64.tar.gz -C /tmp
           sudo mv /tmp/eksctl /usr/local/bin
         else
-          echo "eksctl is already installed. Skipping installation."
+          echo "eksctl is already installed."
         fi
 
-    # 3. AWS Kimlik Bilgilerini Ayarla
+    # 3. Set up AWS Credentials
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v3
       with:
@@ -52,7 +53,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # 4. EKS Kümesi Oluştur
+    # 4. Create EKS Cluster
     - name: Create EKS Cluster
       run: |
         eksctl create cluster \
@@ -60,28 +61,36 @@ jobs:
         --region us-east-1 \
         --nodegroup-name standard-workers \
         --node-type t3.medium \
-        --nodes 2
-        
-        # Kümenin aktif olmasını bekle
+        --nodes 2 \
+        --managed
+
+        # Wait for the EKS cluster to be active
         aws eks wait cluster-active --name mern-cluster --region us-east-1
 
-    # 5. Kubernetes için Kubeconfig Ayarla
+    # 5. Set up kubeconfig for kubectl
     - name: Update kubeconfig
       run: aws eks --region us-east-1 update-kubeconfig --name mern-cluster
 
-    - name: Mongodb Deployment
+    # 6. Deploy MongoDB (Optional step)
+    - name: Deploy MongoDB
       run: |
-        kubectl create ns mern-stack
-        kubectl apply -f mongo-deployment.yml
-        kubectl apply -f mongo-secret.yml
-        kubectl apply -f mongo-configmap.yml
+        kubectl create ns mern-stack || true
+        kubectl apply -f database/mongodb-deployment.yml
+        kubectl apply -f database/mongodb-headless-service.yml
+        kubectl apply -f database/mongodb-pvc.yml
+        kubectl apply -f database/mongodb-secret.yml
 
-    # 6. Backend Deployment
+    # 7. Deploy Backend
     - name: Deploy Backend
       run: |
+        kubectl apply -f manifest/mongo-config.yml
         kubectl apply -f manifest/backend-deployment.yml
+        kubectl apply -f manifest/backend-service.yml
 
-    # 7. Frontend Deployment
+    # 8. Deploy Frontend
     - name: Deploy Frontend
       run: |
         kubectl apply -f manifest/frontend-deployment.yml
+        kubectl apply -f manifest/frontend-service.yml
+
+  
