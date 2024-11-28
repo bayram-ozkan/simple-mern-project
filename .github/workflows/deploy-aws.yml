@@ -3,7 +3,7 @@ name: Deploy to AWS EKS
 on:
   push:
     branches:
-      - aws
+      - main
     paths:
       - 'backend/**'
       - 'frontend/**'
